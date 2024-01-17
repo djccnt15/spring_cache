@@ -24,6 +24,7 @@ public class UserService {
     private final UserConverter userConverter;
     private final JedisPool jedisPool;
     private final RedisTemplate<String, UserEntity> userRedisTemplate;
+    private final RedisTemplate<String, Object> objectRedisTemplate;
     
     public UserEntity getUser(final Long id) {
         try (Jedis jedis = jedisPool.getResource()) {
@@ -58,6 +59,25 @@ public class UserService {
             var userHash = userConverter.toHashMap(user);
             userRedisTemplate.opsForHash().putAll(userRedis, userHash);
             userRedisTemplate.expire(userRedis, Duration.ofSeconds(30));
+            
+            return user;
+        }
+        
+        return userConverter.mapToEntity(cachedUser);
+    }
+    
+    public UserEntity getUserWithGeneric(final Long id) {
+        var userRedis = "usersWithGeneric:%d".formatted(id);
+        
+        var cachedUser = objectRedisTemplate.opsForHash().entries(userRedis);
+        
+        if (cachedUser.isEmpty()) {
+            var userEntity = userRepository.findById(id);
+            var user = userEntity.orElseThrow(() -> new ApiException(StatusCode.NULL_PONT));
+            
+            var userHash = userConverter.toHashMap(user);
+            objectRedisTemplate.opsForHash().putAll(userRedis, userHash);
+            objectRedisTemplate.expire(userRedis, Duration.ofSeconds(30));
             
             return user;
         }

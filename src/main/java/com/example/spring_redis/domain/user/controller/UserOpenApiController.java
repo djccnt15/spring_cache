@@ -31,4 +31,12 @@ public class UserOpenApiController {
         var response = userBusiness.getUserWithTemplate(id);
         return Api.OK(response);
     }
+    
+    @GetMapping(path = "/generic/{id}")
+    public Api<UserResponse> getUserWithGeneric(
+        @PathVariable Long id
+    ) {
+        var response = userBusiness.getUserWithGeneric(id);
+        return Api.OK(response);
+    }
 }

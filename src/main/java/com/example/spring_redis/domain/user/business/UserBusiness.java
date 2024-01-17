@@ -24,4 +24,10 @@ public class UserBusiness {
         var response = userConverter.toResponse(userEntity);
         return response;
     }
+    
+    public UserResponse getUserWithGeneric(Long id) {
+        var userEntity = userService.getUserWithGeneric(id);
+        var response = userConverter.toResponse(userEntity);
+        return response;
+    }
 }
