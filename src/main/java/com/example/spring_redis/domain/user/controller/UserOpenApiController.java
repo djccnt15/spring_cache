@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping(path = "/user")
 public class UserOpenApiController {
-
+    
     private final UserBusiness userBusiness;
     
     @GetMapping(path = "/{id}")
@@ -21,6 +21,14 @@ public class UserOpenApiController {
         @PathVariable Long id
     ) {
         var response = userBusiness.getUser(id);
+        return Api.OK(response);
+    }
+    
+    @GetMapping(path = "/template/{id}")
+    public Api<UserResponse> getUserWithTemplate(
+        @PathVariable Long id
+    ) {
+        var response = userBusiness.getUserWithTemplate(id);
         return Api.OK(response);
     }
 }

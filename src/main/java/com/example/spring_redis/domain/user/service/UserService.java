@@ -7,10 +7,12 @@ import com.example.spring_redis.exception.ApiException;
 import com.example.spring_redis.status.StatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Slf4j
@@ -21,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserConverter userConverter;
     private final JedisPool jedisPool;
+    private final RedisTemplate<String, UserEntity> userRedisTemplate;
     
     public UserEntity getUser(final Long id) {
         try (Jedis jedis = jedisPool.getResource()) {
@@ -41,5 +44,24 @@ public class UserService {
             
             return userConverter.hashToEntity(userInfo);
         }
+    }
+    
+    public UserEntity getUserWithTemplate(final Long id) {
+        var userRedis = "usersWithTemplate:%d".formatted(id);
+        
+        var cachedUser = userRedisTemplate.opsForHash().entries(userRedis);
+        
+        if (cachedUser.isEmpty()) {
+            var userEntity = userRepository.findById(id);
+            var user = userEntity.orElseThrow(() -> new ApiException(StatusCode.NULL_PONT));
+            
+            var userHash = userConverter.toHashMap(user);
+            userRedisTemplate.opsForHash().putAll(userRedis, userHash);
+            userRedisTemplate.expire(userRedis, Duration.ofSeconds(30));
+            
+            return user;
+        }
+        
+        return userConverter.mapToEntity(cachedUser);
     }
 }

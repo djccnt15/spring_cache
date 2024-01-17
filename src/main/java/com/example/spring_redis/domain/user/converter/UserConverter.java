@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Converter
 public class UserConverter {
-
+    
     public UserResponse toResponse(
         UserEntity entity
     ) {
@@ -53,6 +53,20 @@ public class UserConverter {
             .email(userHash.get("userEmail"))
             .createdAt(LocalDateTime.parse(userHash.get("createdAt"), formatter))
             .updatedAt(LocalDateTime.parse(userHash.get("updatedAt"), formatter))
+            .build();
+    }
+    
+    public UserEntity mapToEntity(
+        Map<Object, Object> userHash
+    ) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+        
+        return UserEntity.builder()
+            .id(Long.parseLong(String.valueOf(userHash.get("userId"))))
+            .name(String.valueOf(userHash.get("userName")))
+            .email(String.valueOf(userHash.get("userEmail")))
+            .createdAt(LocalDateTime.parse(String.valueOf(userHash.get("createdAt")), formatter))
+            .updatedAt(LocalDateTime.parse(String.valueOf(userHash.get("updatedAt")), formatter))
             .build();
     }
 }

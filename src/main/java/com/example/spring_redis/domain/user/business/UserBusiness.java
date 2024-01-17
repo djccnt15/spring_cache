@@ -18,4 +18,10 @@ public class UserBusiness {
         var response = userConverter.toResponse(userEntity);
         return response;
     }
+    
+    public UserResponse getUserWithTemplate(Long id) {
+        var userEntity = userService.getUserWithTemplate(id);
+        var response = userConverter.toResponse(userEntity);
+        return response;
+    }
 }
