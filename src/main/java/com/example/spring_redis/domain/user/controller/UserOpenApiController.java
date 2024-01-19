@@ -39,4 +39,12 @@ public class UserOpenApiController {
         var response = userBusiness.getUserWithGeneric(id);
         return Api.OK(response);
     }
+    
+    @GetMapping(path = "/redis-hash/{id}")
+    public Api<UserResponse> getUserWithRedisHash(
+        @PathVariable Long id
+    ) {
+        var response = userBusiness.getUserWithRedisHash(id);
+        return Api.OK(response);
+    }
 }

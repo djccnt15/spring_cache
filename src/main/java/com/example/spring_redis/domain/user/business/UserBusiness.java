@@ -30,4 +30,10 @@ public class UserBusiness {
         var response = userConverter.toResponse(userEntity);
         return response;
     }
+    
+    public UserResponse getUserWithRedisHash(Long id) {
+        var userRedisHash = userService.getUserWithRedisHash(id);
+        var response = userConverter.toResponse(userRedisHash);
+        return response;
+    }
 }

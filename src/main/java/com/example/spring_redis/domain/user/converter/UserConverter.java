@@ -2,6 +2,7 @@ package com.example.spring_redis.domain.user.converter;
 
 import com.example.spring_redis.annotation.Converter;
 import com.example.spring_redis.db.user.jpa.UserEntity;
+import com.example.spring_redis.db.user.redis.UserRedisHash;
 import com.example.spring_redis.domain.user.controller.model.UserResponse;
 import com.example.spring_redis.exception.ApiException;
 import com.example.spring_redis.status.StatusCode;
@@ -25,6 +26,20 @@ public class UserConverter {
                 .email(entity.getEmail())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
+                .build())
+            .orElseThrow(() -> new ApiException(StatusCode.NULL_PONT));
+    }
+    
+    public UserResponse toResponse(
+        UserRedisHash userRedisHash
+    ) {
+        return Optional.ofNullable(userRedisHash)
+            .map(it -> UserResponse.builder()
+                .id(userRedisHash.getId())
+                .name(userRedisHash.getName())
+                .email(userRedisHash.getEmail())
+                .createdAt(userRedisHash.getCreatedAt())
+                .updatedAt(userRedisHash.getUpdatedAt())
                 .build())
             .orElseThrow(() -> new ApiException(StatusCode.NULL_PONT));
     }

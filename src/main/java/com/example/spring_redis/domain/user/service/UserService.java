@@ -2,6 +2,8 @@ package com.example.spring_redis.domain.user.service;
 
 import com.example.spring_redis.db.user.jpa.UserEntity;
 import com.example.spring_redis.db.user.jpa.UserRepository;
+import com.example.spring_redis.db.user.redis.UserRedisHash;
+import com.example.spring_redis.db.user.redis.UserRedisHashRepository;
 import com.example.spring_redis.domain.user.converter.UserConverter;
 import com.example.spring_redis.exception.ApiException;
 import com.example.spring_redis.status.StatusCode;
@@ -21,6 +23,7 @@ import java.util.Map;
 public class UserService {
     
     private final UserRepository userRepository;
+    private final UserRedisHashRepository userRedisHashRepository;
     private final UserConverter userConverter;
     private final JedisPool jedisPool;
     private final RedisTemplate<String, UserEntity> userRedisTemplate;
@@ -83,5 +86,22 @@ public class UserService {
         }
         
         return userConverter.mapToEntity(cachedUser);
+    }
+    
+    public UserRedisHash getUserWithRedisHash(final Long id) {
+        var cachedUser = userRedisHashRepository.findById(id).orElseGet(() -> {
+            UserEntity userEntity = userRepository.findById(id).orElseThrow(() -> new ApiException(StatusCode.NULL_PONT));
+            
+            return userRedisHashRepository.save(
+                UserRedisHash.builder()
+                    .id(userEntity.getId())
+                    .name(userEntity.getName())
+                    .email(userEntity.getEmail())
+                    .createdAt(userEntity.getCreatedAt())
+                    .updatedAt(userEntity.getUpdatedAt())
+                    .build());
+        });
+        
+        return cachedUser;
     }
 }
