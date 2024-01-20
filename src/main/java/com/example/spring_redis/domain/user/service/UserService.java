@@ -9,6 +9,7 @@ import com.example.spring_redis.exception.ApiException;
 import com.example.spring_redis.status.StatusCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
@@ -16,6 +17,8 @@ import redis.clients.jedis.JedisPool;
 
 import java.time.Duration;
 import java.util.Map;
+
+import static com.example.spring_redis.config.CacheConfig.CACHE1;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -103,5 +106,10 @@ public class UserService {
         });
         
         return cachedUser;
+    }
+    
+    @Cacheable(cacheNames = CACHE1, key = "'user:' + #id")
+    public UserEntity getUserWithCache(final Long id) {
+        return userRepository.findById(id).orElseThrow();
     }
 }

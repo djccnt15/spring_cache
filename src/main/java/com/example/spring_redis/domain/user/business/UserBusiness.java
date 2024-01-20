@@ -36,4 +36,10 @@ public class UserBusiness {
         var response = userConverter.toResponse(userRedisHash);
         return response;
     }
+    
+    public UserResponse getUserWithCache(Long id) {
+        var userEntity = userService.getUserWithCache(id);
+        var response = userConverter.toResponse(userEntity);
+        return response;
+    }
 }

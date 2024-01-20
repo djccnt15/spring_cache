@@ -47,4 +47,12 @@ public class UserOpenApiController {
         var response = userBusiness.getUserWithRedisHash(id);
         return Api.OK(response);
     }
+    
+    @GetMapping(path = "/cache/{id}")
+    public Api<UserResponse> getUserWithCache(
+        @PathVariable Long id
+    ) {
+        var response = userBusiness.getUserWithCache(id);
+        return Api.OK(response);
+    }
 }
